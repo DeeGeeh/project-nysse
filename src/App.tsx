@@ -1,35 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import './api/waltti/route.tsx';
+import './App.css';
+import { GET, WALTTI_ENDPOINT } from './api/waltti/route.tsx';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function TopBar() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <header className="top-bar">
+      <h1>GTFS Map</h1>
+    </header>
+  );
 }
 
-export default App
+function App() {
+  const [data, setData] = useState<any>(null); // State for storing fetched data
+  const [error, setError] = useState<string | null>(null); // State for handling errors
+  const [loading, setLoading] = useState<boolean>(true); // State for handling loading
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await GET(new Request(WALTTI_ENDPOINT));
+        setData(result); // Update state with fetched data
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch WALTTI data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  return (
+    <div className="App">
+      <TopBar />
+      <main>
+        {loading && <p>Loading data...</p>}
+        {error && <p>Error: {error}</p>}
+        {data ? (
+          <div>
+            <h2>Fetched Data:</h2>
+            <pre>{JSON.stringify(data, null, 2)}</pre> {/* Display raw data */}
+          </div>
+        ) : (
+          !loading && <p>No data available</p>
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default App;
