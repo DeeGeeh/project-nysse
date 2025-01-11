@@ -65,7 +65,6 @@ async function fetchDelayedVehicles(subscriptionKey: string) {
 
         return delayedTrips;
 
-    // eslint-disable-next-line
     } catch (error: any) {
         console.error('Fetch error:', error);  // Add logging
         return NextResponse.json(
