@@ -47,7 +47,6 @@ export async function GET() {
 
     return NextResponse.json(object);
     
-    // eslint-disable-next-line
   } catch (error: any) {
     console.error('Fetch error:', error);  // Add logging
     return NextResponse.json(
