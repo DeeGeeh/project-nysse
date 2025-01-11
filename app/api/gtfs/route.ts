@@ -5,8 +5,8 @@ import protobuf from 'protobufjs';
 const WALTTI_ENDPOINT = "https://data.waltti.fi";
 
 export async function GET() {
-    const clientId = process.env.NEXT_PUBLIC_WALTTI_CLIENT_ID || "";
-    const clientSecret = process.env.NEXT_PUBLIC_WALTTI_CLIENT_SECRET || "";
+    const clientId = process.env.WALTTI_CLIENT_ID || "";
+    const clientSecret = process.env.WALTTI_CLIENT_SECRET || "";
 
     if (!clientId || !clientSecret) {
         return NextResponse.json(
@@ -21,7 +21,7 @@ export async function GET() {
     const FeedMessage = root.lookupType('transit_realtime.FeedMessage');
 
     const authHeader = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-    const url = `${WALTTI_ENDPOINT}/tampere/api/gtfsrealtime/v1.0/feed/vehicleposition`;
+    const url = `${WALTTI_ENDPOINT}/tampere/api/gtfsrealtime/v1.0/feed/tripupdate`;
 
     const response = await fetch(url, {
       method: 'GET',
@@ -47,6 +47,7 @@ export async function GET() {
 
     return NextResponse.json(object);
     
+    // eslint-disable-next-line
   } catch (error: any) {
     console.error('Fetch error:', error);  // Add logging
     return NextResponse.json(
