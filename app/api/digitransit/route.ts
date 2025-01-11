@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 const DIGITRANSIT_ENDPOINT = 'https://api.digitransit.fi/routing/v2/waltti/gtfs/v1';
 
-export async function POST() {
+export async function GET() {
     const subscriptionKey = process.env.DIGITRANSIT_KEY || "";
 
     if (!subscriptionKey) {
@@ -25,6 +25,7 @@ export async function POST() {
 }
 
 async function fetchDelayedVehicles(subscriptionKey: string) {
+
     const query = `
     {
       trips(feeds: "tampere") {
@@ -33,6 +34,7 @@ async function fetchDelayedVehicles(subscriptionKey: string) {
         tripHeadsign
         stoptimesForDate(serviceDate: "20250111") {
           departureDelay
+          realtimeState
         }
       }
     }`;
@@ -41,10 +43,10 @@ async function fetchDelayedVehicles(subscriptionKey: string) {
         const response = await fetch(DIGITRANSIT_ENDPOINT, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': subscriptionKey,
+                'Content-Type': 'application/graphql',
+                'digitransit-subscription-key': subscriptionKey,
             },
-            body: JSON.stringify({ query }),
+            body: query,
         });
 
         if (!response.ok) {
@@ -52,15 +54,24 @@ async function fetchDelayedVehicles(subscriptionKey: string) {
         }
 
         const data = await response.json();
-        const delayedTrips = data.data.trips.filter((trip: any) =>
-            trip.stoptimesForDate.some((stop: any) => stop.departureDelay > 0)
+
+        // Get delayed trips
+        let delayedTrips = data.data.trips.filter((trip: any) =>
+            trip.stoptimesForDate.some((stop: any) => stop.departureDelay > 60)
+        );
+        delayedTrips = data.data.trips.filter((trip: any) => 
+            trip.stoptimesForDate.some((stop: any) => stop.realtimeState != "CANCELED")
         );
 
         return delayedTrips;
+
+    // eslint-disable-next-line
     } catch (error: any) {
+        console.error('Fetch error:', error);  // Add logging
         return NextResponse.json(
-            { error: "Failed to fetch delayed vehicles." },
+            { error: `Unexpected error occurred: ${error.message}` }, 
             { status: 500 }
+            
         );
     }
 }
