@@ -54,7 +54,7 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/digitransit');
+        const response = await fetch('/api/digitransit/waltti');
         if (!response.ok) throw new Error('Failed to fetch data');
         const data = await response.json();
 
