@@ -49,7 +49,7 @@ export async function GET() {
 
         return NextResponse.json(delayedTrips, { status: 200 });
     } catch (error: any) {
-        console.error("Error fetching delayed vehicles:", error);
+        console.log("Error fetching delayed vehicles:", error);
         return NextResponse.json(
             { error: "Failed to fetch delayed vehicles." },
             { status: 500 }
@@ -58,6 +58,7 @@ export async function GET() {
 }
 
 async function fetchDelayedVehicles(subscriptionKey: string) {
+    
     // Get current date in YYYYMMDD format
     const today: string = new Date().toISOString().split('T')[0].replace(/-/g, '');
 
@@ -88,7 +89,7 @@ async function fetchDelayedVehicles(subscriptionKey: string) {
             },
             body: JSON.stringify({ query }),
         });
-
+        
         if (!response.ok && cacheData === null) {
             throw new Error(`API response error: ${response.statusText}`);
         }
