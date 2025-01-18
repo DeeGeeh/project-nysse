@@ -9,16 +9,18 @@ interface Card {
   loading: boolean;
   error?: any;
   logoSrc?: string;
+  logoSizeRatio?: number;
 }
 
 const CreateCard = (
-  title: string, stats: any, loading: boolean, error?: any, logoSrc?: string): Card => {
+  title: string, stats: any, loading: boolean, error?: any, logoSrc?: string, logoSizeRatio?: number): Card => {
   const newCard: Card = {
     title,
     stats,
     loading,
     error,
     logoSrc,
+    logoSizeRatio
   };
   return newCard;
 };
@@ -135,17 +137,21 @@ const Page = () => {
 
   const renderStats = (card: Card) => (
     <div className="mt-8 bg-white rounded-lg shadow-sm">
-      <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-        <h2 className="text-xl text-black font-bold text-center w-full">
-          {card.title}
-        </h2>
-      {card.logoSrc && (
-        <img
-          src={card.logoSrc}
-          alt={`${card.title} logo`}
-          className="h-12 w-auto object-contain"
-        />
-      )}      </div>
+      <div className="p-6 border-b border-gray-200 flex justify-center items-center">
+        {card.logoSrc && (
+          <img
+            src={card.logoSrc}
+            alt={`${card.title} logo`}
+            className="object-contain"
+            style={{
+              // The nysse logo appears to be bigger to the eye.
+              // This makes them look the same size. 
+              height: card.logoSizeRatio ? `${card.logoSizeRatio * 2.5}rem` : "3rem",
+              width: "auto",
+            }}
+          />
+        )}
+      </div>
       <div className="p-6">
         {card.loading ? (
           <div className="flex justify-center items-center h-64">
@@ -167,7 +173,7 @@ const Page = () => {
     </div>
   );
 
-  const WalttiCard = CreateCard("NYSSE", walttiStats, walttiLoading, walttiError, "/nysse_logo.svg");
+  const WalttiCard = CreateCard("NYSSE", walttiStats, walttiLoading, walttiError, "/nysse_logo_iso.svg", 0.9);
   const HSLCard = CreateCard("HSL", hslStats, hslLoading, hslError, "/HSL_logo.svg");
 
   return (
@@ -179,7 +185,7 @@ const Page = () => {
         <a href="/" className="p-2 hover:bg-slate-100 rounded-lg">
           <Home size={24} />
         </a>
-        <span className="font-bold">Project</span>
+        <span className="font-bold">DelayCheck</span>
         <a href="/map" className="p-2 hover:bg-slate-100 rounded-lg">
           <Map size={24} />
         </a>
