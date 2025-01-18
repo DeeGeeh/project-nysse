@@ -1,7 +1,28 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Home, Map, Clock } from "lucide-react";
+import { Home, Map } from "lucide-react";
+
+interface Card {
+  title: string;
+  stats: any;
+  loading: boolean;
+  error?: any;
+  logoSrc?: string;
+}
+
+const CreateCard = (
+  title: string, stats: any, loading: boolean, error?: any, logoSrc?: string): Card => {
+  const newCard: Card = {
+    title,
+    stats,
+    loading,
+    error,
+    logoSrc,
+  };
+  return newCard;
+};
+
 
 const PercentageCircle = ({ percentage = 0 }) => (
   <div className="relative w-48 h-48">
@@ -112,27 +133,32 @@ const Page = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const renderStats = (title: string, stats: any, loading: boolean, error: any) => (
+  const renderStats = (card: Card) => (
     <div className="mt-8 bg-white rounded-lg shadow-sm">
       <div className="p-6 border-b border-gray-200 flex justify-between items-center">
         <h2 className="text-xl text-black font-bold text-center w-full">
-          {title}
+          {card.title}
         </h2>
-        <Clock className="text-black" />
-      </div>
+      {card.logoSrc && (
+        <img
+          src={card.logoSrc}
+          alt={`${card.title} logo`}
+          className="h-12 w-auto object-contain"
+        />
+      )}      </div>
       <div className="p-6">
-        {loading ? (
+        {card.loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
           </div>
-        ) : error ? (
-          <div className="text-center text-red-500 p-4">{error}</div>
+        ) : card.error ? (
+          <div className="text-center text-red-500 p-4">{card.error}</div>
         ) : (
           <div className="flex flex-col items-center space-y-4 text-black">
-            <PercentageCircle percentage={stats.percentage} />
+            <PercentageCircle percentage={card.stats.percentage} />
             <div className="text-center space-y-2">
               <p className="text-gray-600">
-                {stats.delayedCount} out of {stats.totalTrips} trips are delayed
+                {card.stats.delayedCount} out of {card.stats.totalTrips} trips are delayed
               </p>
             </div>
           </div>
@@ -140,6 +166,9 @@ const Page = () => {
       </div>
     </div>
   );
+
+  const WalttiCard = CreateCard("NYSSE", walttiStats, walttiLoading, walttiError, "/nysse_logo.svg");
+  const HSLCard = CreateCard("HSL", hslStats, hslLoading, hslError, "/HSL_logo.svg");
 
   return (
     <div className="h-screen w-full bg-gray">
@@ -156,8 +185,8 @@ const Page = () => {
         </a>
       </nav>
       <div className="max-w-4xl mx-auto p-4">
-        {renderStats("NYSSE", walttiStats, walttiLoading, walttiError)}
-        {renderStats("HSL", hslStats, hslLoading, hslError)}
+        {renderStats(WalttiCard)}
+        {renderStats(HSLCard)}
       </div>
     </div>
   );
